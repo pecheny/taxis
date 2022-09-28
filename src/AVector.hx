@@ -1,6 +1,6 @@
 import haxe.macro.Expr.ExprOf;
 
-abstract AVector<TAxis:Axis, T>(haxe.ds.Vector<T>) {
+abstract AVector<TAxis:Axis<TAxis>, T>(haxe.ds.Vector<T>) {
 	// @:generic inline public static function factoryCreate<TAxis:Axis, T>( fac:TAxis->T):AVector<TAxis, T> {
 	// 	return cast new haxe.ds.Vector<Int>(2);
 	// 	// return macro cast new haxe.ds.Vector<Int>(TAxis.aliases.length);
