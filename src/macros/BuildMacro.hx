@@ -7,6 +7,8 @@ import haxe.macro.Context;
 
 class BuildMacro {
 	public static function buildAxes() {
+		var t= Context.getLocalType();
+		var ct = t.toComplexType();
 		var fields = Context.getBuildFields();
 		var vals = [];
 		for (f in fields) {
@@ -36,7 +38,7 @@ class BuildMacro {
 			kind: FieldType.FFun({
 				args: [],
 				expr: macro return cast $p{["Axis", "k" + vals.length, "iterator"]}(),
-				ret: macro:Iterator<macros.BuildMacroTest.TestAxis>
+				ret: macro:Iterator<$ct>
 			}),
 			access: [APublic, AStatic]
 		});
