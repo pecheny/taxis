@@ -2,6 +2,7 @@ package macros;
 
 import utest.Assert;
 import utest.Test;
+import TestAxis;
 
 class BuildMacroTest extends Test {
 	public function testAxisBuilding() {
@@ -39,24 +40,5 @@ class Dummy {
 
 	public function new(a) {
 		this.a = a;
-	}
-}
-
-@:build(macros.BuildMacro.buildAxes())
-@:enum abstract TestAxis(Axis) to Axis {
-	var zero;
-	var one;
-	var two;
-}
-
-@:generic
-class ContainerSmpl<TAxis:Axis> {
-	var layoutMap:AVector<TAxis, String>;
-	public var tostrings:Array<String>;
-
-	public function new() {
-		var layoutMap = AAA.factoryCreate(TAxis, a -> "" + a);
-		// var layoutMap = AAA.fc2(TAxis, a -> "" + a);
-		tostrings = [for (a in layoutMap.axes()) layoutMap[a]];
 	}
 }
