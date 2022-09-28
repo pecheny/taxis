@@ -4,6 +4,7 @@ import haxe.macro.Expr.ComplexType;
 import haxe.macro.Expr.Access;
 import haxe.ds.ReadOnlyArray;
 import haxe.macro.Context;
+using haxe.macro.TypeTools;
 
 class BuildMacro {
 	public static function buildAxes() {
@@ -42,6 +43,37 @@ class BuildMacro {
 			}),
 			access: [APublic, AStatic]
 		});
+		// fields.push({
+		// 	pos: Context.currentPos(),
+		// 	name: "rest",
+		// 	kind: FieldType.FFun({
+		// 		args: [],
+		// 		expr: macro return cast $p{["Axis", "k" + vals.length, "iterator"]}(),
+		// 		ret: macro:Iterator<macros.BuildMacroTest.TestAxis>
+		// 	}),
+		// 	access: [APublic, AInline]
+		// });
+		// fields.push({
+		// 	pos: Context.currentPos(),
+		// 	name: "next",
+		// 	kind: FieldType.FFun({
+		// 		args: [],
+		// 		expr: macro return cast this + 1,
+		// 		ret: macro:$ct
+		// 	}),
+		// 	access: [APublic, AInline]
+		// });
+		// fields.push({
+		// 	pos: Context.currentPos(),
+		// 	name: "hasNext",
+		// 	kind: FieldType.FFun({
+		// 		args: [],
+		// 		expr: macro return ( cast this  )< $v{vals.length},
+		// 		ret: macro:Bool
+		// 	}),
+		// 	access: [APublic, AInline]
+		// });
+
 
 		// fields.push(macro final aliases = $a{[macro "foo"]});
 		return fields;
