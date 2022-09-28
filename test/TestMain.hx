@@ -1,9 +1,9 @@
-import macros.BuildMacroTest;
+import macros.*;
 class TestMain {
     static function main() {
 		utest.UTest.run([
-			new BuildMacroTest(),
+			// new BuildMacroTest(),
+			new BuildClientTest()
 		]);
 	}
- 
 }
