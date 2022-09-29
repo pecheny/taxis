@@ -1,5 +1,6 @@
 package macros;
 
+import macros.BuildClient;
 import utest.Test;
 
 class BuildClientTest extends Test {
@@ -9,16 +10,21 @@ class BuildClientTest extends Test {
 
 }
 
-@:genericBuild(macros.BuildClient.build())
-class ContainerSmpl<TAxis:Axis<TAxis>> {
+// @:genericBuild(macros.BuildClient.build())
+@:autoBuild(macros.BuildClient.build2())
+class AxisUser<T> {
+	
+}
+@:generic class ContainerSmpl<TAxis:Axis<TAxis>> extends AxisUser<TAxis>{
 	var layoutMap:AVector<TAxis, String>;
 
 	public var tostrings:Array<String>;
 
 	public function new() {
-		trace("smpl");
-		var a:TAxis;
-		a.first();
+		// layoutMap.axes
+		// trace("smpl");
+		// var a:TAxis;
+		// a.first();
 		// for (a in a.rest())
 		// 	trace(a);
 
