@@ -7,24 +7,19 @@ import Type as HType;
 using haxe.macro.ComplexTypeTools;
 using haxe.macro.TypeTools;
 using haxe.macro.ExprTools;
+using Std;
 
 class AAA {
+	/**
+		Generates code of creating a AVector<TAxis, T>
+		@param axisCl - type of axis.
+		@param fac - factory method to create values. T in the resulting AVector would be of type returning by the fac.
+		@param nm - number of axes in the given enum. Should be provided for calls from @:generic classes when there is no way to calculate it during generation step and can be omitted otherwise.
+	**/
 
-	public static macro function factoryCreate<TAxis, T>(axisCl:ExprOf<Class<TAxis>>, fac:ExprOf<TAxis->T>) {
-		// function trClt(t:ClassType) {
-		// 	trace(t.kind);
-		// 	trace(t.params);
-		// }
-		// function tr(t:Type) {
-		// 	switch t {
-		// 		case TInst(_.get() => t, params):
-		// 			trClt(t);
-		// 			trace(params);
-		// 		case _:
-		// 	}
-		// }
-		// trClt(Context.getLocalClass().get());
-		// tr(Context.getLocalType().follow());
+
+	public static macro function factoryCreate<TAxis:Axis<TAxis>, T>(axisCl:ExprOf<Class<TAxis>>, fac:ExprOf<Function>, ?nm:Expr) {
+		// public static macro function factoryCreate<TAxis:Axis<TAxis>, T>(axisCl:ExprOf<Class<TAxis>>, fac:ExprOf<TAxis->T>, ?nm:Expr) {
 		var facT = Context.typeof(fac);
 		var facCt = facT.toComplexType();
 		var valCt = // if (facCt != null) switch facCt {
@@ -41,18 +36,30 @@ class AAA {
 			}
 		var cl = getAxisType(axisCl);
 		var ct = cl.toComplexType();
-		var n = BuildMacro.calcNumOfvals(cl);
+		var ft = macro:$ct -> $valCt;
+		var assignExprs:Array<Expr>;
+		var countExpr:Expr = null;
+		countExpr = switch nm.expr {
+			case EConst(CIdent("null")):
+				macro $v{BuildMacro.calcNumOfvals(cl)};
+			case EConst(CIdent(s)):
+				macro $i{s};
+			case EConst(CInt(_.parseInt() => s)):
+				macro $v{s};
+			case _:
+				Context.fatalError("Only int const or int variable can be used as nm argument", Context.currentPos());
+				throw "Wrong";
+		}
 		var vectorCt = macro:AVector<$ct, $valCt>;
-		var assignExprs = [
-			for (i in 0...n)
-				macro av[cast $v{i}] = _fac(cast $v{i})
+		var assignExprs:Array<Expr> = [
+			macro for (i in 0...$countExpr)
+				av[cast i] = _fac(cast i)
 		];
+
 		return macro {
-			var _fac = $fac;
-			var av:$vectorCt = cast new haxe.ds.Vector<$valCt>($v{n});
+			var _fac:$ft = $fac;
+			var av:$vectorCt = cast new haxe.ds.Vector<$valCt>($countExpr);
 			$b{assignExprs};
-			// for (i in $axisCl)
-			// 	av[cast i] = _fac(cast i);
 			av;
 		}
 	}
