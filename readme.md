@@ -16,4 +16,5 @@ The vector (```AVector```) is an abstract on top of underlying ```haxe.ds.Vector
 ## TODO
 * write readme
 * generate inline getters according to axis aliases.
+* haxelib.json
 * [minor] is it possible to autodetect n for factoryCreate() calls in @:generic classes
