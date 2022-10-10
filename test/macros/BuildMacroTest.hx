@@ -20,12 +20,12 @@ class BuildMacroTest extends Test {
 
 	public function testAVector() {
 		// Assert.raises(() -> AAA.create(TestAxis, TestAxis.one, TestAxis.two), null, "Should fail on wrong number of args"); -- fails in compile time.
-		var avec = AAA.create(TestAxis, TestAxis.zero, TestAxis.one, TestAxis.two);
+		var avec = AVConstructor.create(TestAxis, TestAxis.zero, TestAxis.one, TestAxis.two);
 		Assert.equals(TestAxis.zero, avec[zero]);
 		Assert.equals(TestAxis.zero.toString(), "" + avec[zero]);
-		var avec2:AVector<TestAxis, Dummy> = AAA.factoryCreate(TestAxis, a -> new Dummy(a)); // check type inference for arrow function argument
+		var avec2:AVector<TestAxis, Dummy> = AVConstructor.factoryCreate(TestAxis, a -> new Dummy(a)); // check type inference for arrow function argument
 		Assert.equals(one, avec2[one].a);
-		var avec3:AVector<TestAxis, String> = AAA.factoryCreate(TestAxis, dummyFactory); // check type inference for method reference
+		var avec3:AVector<TestAxis, String> = AVConstructor.factoryCreate(TestAxis, dummyFactory); // check type inference for method reference
 		Assert.equals(TestAxis.zero.toString(), "" + avec3[zero]);
 	}
 

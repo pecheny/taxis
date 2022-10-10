@@ -10,9 +10,9 @@ class BuildClientTest extends Test {
 		for (a in it) {
 			var a1:TestAxis = a;
 		}
-		var tavec:AVector<TestAxis, TestAxis> = AAA.factoryCreate(TestAxis, a -> a); // can infere type by declared one
-		var tavec:AVector<TestAxis, String> = AAA.factoryCreate(TestAxis, a -> "" + a);//Can unify campatible types
-		var tavec = AAA.factoryCreate(TestAxis, a -> "" + a); //can infere type according to ret type of the fac
+		var tavec:AVector<TestAxis, TestAxis> = AVConstructor.factoryCreate(TestAxis, a -> a); // can infere type by declared one
+		var tavec:AVector<TestAxis, String> = AVConstructor.factoryCreate(TestAxis, a -> "" + a);//Can unify campatible types
+		var tavec = AVConstructor.factoryCreate(TestAxis, a -> "" + a); //can infere type according to ret type of the fac
 		var val = tavec[one];
 		Assert.isOfType(val, String);
 		var c = new ContainerSmpl<TestAxis>(3);
@@ -27,7 +27,7 @@ class ContainerSmpl<TAxis:Axis<TAxis>> {
 	public var tostrings:Array<String>;
 
 	public function new(n) {
-		layoutMap = AAA.factoryCreate(TAxis, a -> "" + a, n);
+		layoutMap = AVConstructor.factoryCreate(TAxis, a -> "" + a, n);
 		tostrings = [for (a in layoutMap.axes()) layoutMap[a] + " " + a];
 	}
 }

@@ -1,3 +1,4 @@
+package macros;
 import haxe.macro.Type.ClassType;
 import macros.BuildMacro;
 import haxe.macro.Expr;
@@ -9,7 +10,7 @@ using haxe.macro.TypeTools;
 using haxe.macro.ExprTools;
 using Std;
 
-class AAA {
+class AVConstructor {
 	/**
 		Generates code of creating a AVector<TAxis, T>
 		@param axisCl - type of axis.
