@@ -1,9 +1,0 @@
--cp src
-# -main Pg
-# -main AxisTest
--main ImplicitToString 
--D dump=pretty
---interp
-# -D macro
-# -D js-es=6
-# --js "js.js"

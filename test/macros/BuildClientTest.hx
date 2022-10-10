@@ -1,7 +1,6 @@
 package macros;
 
 import utest.Assert;
-import macros.BuildClient;
 import utest.Test;
 import TestAxis;
 
