@@ -16,24 +16,30 @@ class AAA {
 		@param fac - factory method to create values. T in the resulting AVector would be of type returning by the fac.
 		@param nm - number of axes in the given enum. Should be provided for calls from @:generic classes when there is no way to calculate it during generation step and can be omitted otherwise.
 	**/
-
-
-	public static macro function factoryCreate<TAxis:Axis<TAxis>, T>(axisCl:ExprOf<Class<TAxis>>, fac:ExprOf<Function>, ?nm:Expr) {
-		// public static macro function factoryCreate<TAxis:Axis<TAxis>, T>(axisCl:ExprOf<Class<TAxis>>, fac:ExprOf<TAxis->T>, ?nm:Expr) {
+	public static macro function factoryCreate<TAxis:Axis<TAxis>, T>(axisCl:ExprOf<Class<TAxis>>, fac:ExprOf<TAxis->T>, ?nm:Expr) {
+		var expected = switch Context.getExpectedType() {
+			case TAbstract(_.get() => {name: "AVector"}, [_, t]):
+				t;
+			case _: null;
+		}
+		// var expectedVal =
 		var facT = Context.typeof(fac);
 		var facCt = facT.toComplexType();
-		var valCt = // if (facCt != null) switch facCt {
-			// 	case TFunction([axis], ret): ret;
-			// 	case _: Context.fatalError("To construct an AVector<TAxis, TVal> with factoryCreate() ypu should provide factory function TAxis -> TVal",
-			// 			Context.currentPos());
-			// } else
-			if (facT != null) switch facT {
-				case TFun(args, ret): ret.toComplexType();
-				case _:
-					Context.fatalError("Can't infere factory function type: \n" + facT + "\n " + fac.toString(), Context.currentPos());
-			} else {
-				Context.fatalError("Can't infere factory function type: \n" + fac + "\n " + fac.toString(), Context.currentPos());
-			}
+		var valCt0 = if (facT != null) switch facT {
+			case TFun(args, ret):
+				ret;
+			case _:
+				Context.fatalError("Can't infere factory function type: \n" + facT + "\n " + fac.toString(), Context.currentPos());
+		} else {
+			Context.fatalError("Can't infere factory function type: \n" + fac + "\n " + fac.toString(), Context.currentPos());
+		}
+		if (expected != null)
+			Context.unify(valCt0, expected);
+		var valCt = valCt0.follow().toComplexType();
+
+		if (valCt == null)
+			Context.fatalError("Factory function returns incompatible type " + valCt0.toString(), Context.currentPos());
+
 		var cl = getAxisType(axisCl);
 		var ct = cl.toComplexType();
 		var ft = macro:$ct -> $valCt;
@@ -56,12 +62,13 @@ class AAA {
 				av[cast i] = _fac(cast i)
 		];
 
-		return macro {
+		var expr = macro {
 			var _fac:$ft = $fac;
 			var av:$vectorCt = cast new haxe.ds.Vector<$valCt>($countExpr);
 			$b{assignExprs};
 			av;
 		}
+		return expr;
 	}
 
 	static function getAxisType(axisCl) {
