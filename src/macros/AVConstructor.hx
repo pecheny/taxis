@@ -10,16 +10,21 @@ using haxe.macro.ComplexTypeTools;
 using haxe.macro.TypeTools;
 using haxe.macro.ExprTools;
 using Std;
+using macros.AVConstructor;
 
 class AVConstructor {
     /**
         Generates code of creating a AVector<TAxis, T>
-        @param axisCl - type of axis.
+        @param axisCl - [optional] type of axis.
         @param fac - factory method to create values. T in the resulting AVector would be of type returning by the fac.
-        @param nm - number of axes in the given enum. Should be provided for calls from @:generic classes when there is no way to calculate it during generation step and can be omitted otherwise.
+        @param nm - [optional] number of axes in the given enum. Should be provided for calls from @:generic classes when there is no way to calculate it during generation step and can be omitted otherwise.
     **/
-    public static macro function factoryCreate<TAxis:Axis<TAxis>, T>(axisCl:ExprOf<Class<TAxis>>, fac:ExprOf<TAxis->T>, ?nm:Expr) {
-        var expected = extractExpected(Context.getExpectedType());
+    public static macro function factoryCreate<TAxis:Axis<TAxis>, T>(?axisCl:ExprOf<Class<TAxis>>, ?fac:ExprOf<TAxis->T>, ?nm:Expr) {
+        if (fac.isNull() && nm.isNull()) { // handle omitted axisCl
+            fac = axisCl;
+            axisCl = null; // extractExpectedAxis(Context.getExpectedType());
+            // if (axisCl == null)
+        }
         var facT = Context.typeof(fac);
         var facCt = facT.toComplexType();
         var valCt0 = if (facT != null) switch facT {
@@ -30,6 +35,9 @@ class AVConstructor {
         } else {
             Context.fatalError("Can't infere factory function type: \n" + fac + "\n " + fac.toString(), Context.currentPos());
         }
+        
+        
+        var expected = extractExpected(Context.getExpectedType());
         if (expected != null)
             Context.unify(valCt0, expected);
         var valCt = valCt0.follow().toComplexType();
@@ -37,14 +45,18 @@ class AVConstructor {
         if (valCt == null)
             Context.fatalError("Factory function returns incompatible type " + valCt0.toString(), Context.currentPos());
 
-        var cl = getAxisType(axisCl);
-        var ct = cl.toComplexType();
-        var ft = macro:$ct -> $valCt;
+        var axisType = if (axisCl != null) getAxisType(axisCl) else extractExpectedAxis(Context.getExpectedType());
+        if (axisType == null)
+            Context.fatalError("Cant detext axis type. You should either do set explicit expected type of AVector or pass axis type as first argument",
+                Context.currentPos());
+
+        var axisComplex = axisType.toComplexType();
+        var ft = macro:$axisComplex -> $valCt;
         var assignExprs:Array<Expr>;
         var countExpr:Expr = null;
         countExpr = switch nm.expr {
             case EConst(CIdent("null")):
-                macro $v{BuildMacro.calcNumOfvals(cl)};
+                macro $v{BuildMacro.calcNumOfvals(axisType)};
             case EConst(CIdent(s)):
                 macro $i{s};
             case EConst(CInt(_.parseInt() => s)):
@@ -53,7 +65,7 @@ class AVConstructor {
                 Context.fatalError("Only int const or int variable can be used as nm argument", Context.currentPos());
                 throw "Wrong";
         }
-        var vectorCt = macro:AVector<$ct, $valCt>;
+        var vectorCt = macro:AVector<$axisComplex, $valCt>;
         var assignExprs:Array<Expr> = [
             macro for (i in 0...$countExpr)
                 av[cast i] = _fac(cast i)
@@ -66,6 +78,28 @@ class AVConstructor {
             av;
         }
         return expr;
+    }
+
+    static function isNull(e:Expr) {
+        if (e == null)
+            return true;
+        return switch e.expr {
+            case EConst(CIdent("null")): true;
+            case _: false;
+        }
+    }
+
+    static function extractExpectedAxis(t:Type) {
+        return switch t {
+            case TAbstract(_.get() => {name: "AVector"}, [ax, _]):
+                ax;
+            case TType(_.get() => dt, params):
+                #if macro
+                var t:Type = TypeTools.applyTypeParameters(dt.type, dt.params, params);
+                #end
+                extractExpected(t);
+            case _: null;
+        }
     }
 
     static function extractExpected(t:Type) {

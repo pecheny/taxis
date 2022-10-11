@@ -20,6 +20,11 @@ class BuildClientTest extends Test {
 		var c = new ContainerSmpl<TestAxis>(3);
 		Assert.same(["zero zero", "one one", "two two"], c.tostrings); // test toString in generic user classes
 	}
+
+    function test_can_ommit_axis_with_explicit_expected() {
+		var tavec:AVector<TestAxis, String> = AVConstructor.factoryCreate(a -> "" + a);//Can unify campatible types
+        Assert.equals("one", tavec[one]);
+    }
 }
 
 typedef TestAVector<T> = AVector<TestAxis, T>
