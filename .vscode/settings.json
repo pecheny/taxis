@@ -1,12 +1,14 @@
 {
-	"[haxe]": {
-		// "editor.formatOnSave": true,
-		// "editor.formatOnPaste": true
-	},
-	"haxeTestExplorer.testCommand": [
-		"${haxe}",
-		"test.hxml",
-		"-lib",
-		"test-adapter"
-	]
+    "[haxe]": {
+        // "editor.formatOnSave": true,
+        // "editor.formatOnPaste": true
+    },
+    "haxeTestExplorer.testCommand": [
+        "${haxe}",
+        "test.hxml",
+        "-lib",
+        "test-adapter"
+    ],
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
 }
