@@ -11,6 +11,8 @@ class BuildClientTest extends Test {
 			var a1:TestAxis = a;
 		}
 		var tavec:AVector<TestAxis, TestAxis> = AVConstructor.factoryCreate(TestAxis, a -> a); // can infere type by declared one
+		var tavec:AVector<TestAxis, Array<String>> = AVConstructor.factoryCreate(TestAxis, a -> null); // can infere type by declared one
+		var tavec:TestAVector<Array<String>> = AVConstructor.factoryCreate(TestAxis, a -> null); // can infere type by declared one
 		var tavec:AVector<TestAxis, String> = AVConstructor.factoryCreate(TestAxis, a -> "" + a);//Can unify campatible types
 		var tavec = AVConstructor.factoryCreate(TestAxis, a -> "" + a); //can infere type according to ret type of the fac
 		var val = tavec[one];
@@ -19,6 +21,8 @@ class BuildClientTest extends Test {
 		Assert.same(["zero zero", "one one", "two two"], c.tostrings); // test toString in generic user classes
 	}
 }
+
+typedef TestAVector<T> = AVector<TestAxis, T>
 
 @:generic
 class ContainerSmpl<TAxis:Axis<TAxis>> {

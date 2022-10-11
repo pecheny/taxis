@@ -19,12 +19,7 @@ class AVConstructor {
         @param nm - number of axes in the given enum. Should be provided for calls from @:generic classes when there is no way to calculate it during generation step and can be omitted otherwise.
     **/
     public static macro function factoryCreate<TAxis:Axis<TAxis>, T>(axisCl:ExprOf<Class<TAxis>>, fac:ExprOf<TAxis->T>, ?nm:Expr) {
-        var expected = switch Context.getExpectedType() {
-            case TAbstract(_.get() => {name: "AVector"}, [_, t]):
-                t;
-            case _: null;
-        }
-        // var expectedVal =
+        var expected = extractExpected(Context.getExpectedType());
         var facT = Context.typeof(fac);
         var facCt = facT.toComplexType();
         var valCt0 = if (facT != null) switch facT {
@@ -71,6 +66,19 @@ class AVConstructor {
             av;
         }
         return expr;
+    }
+
+    static function extractExpected(t:Type) {
+        return switch t {
+            case TAbstract(_.get() => {name: "AVector"}, [_, t]):
+                t;
+            case TType(_.get() => dt, params):
+                #if macro
+                var t:Type = TypeTools.applyTypeParameters(dt.type, dt.params, params);
+                #end
+                extractExpected(t);
+            case _: null;
+        }
     }
 
     static function getAxisType(axisCl) {
