@@ -21,7 +21,7 @@ abstract AVector<TAxis:Axis<TAxis>, T>(haxe.ds.Vector<T>) {
     }
 }
 
-abstract ReadOnlyAVector<TAxis:Int, TVal>(haxe.ds.Vector<TVal>) {
+abstract ReadOnlyAVector<TAxis:Axis<TAxis>, TVal>(haxe.ds.Vector<TVal>) {
     @:arrayAccess public inline function get(a:TAxis):TVal {
         return this[a];
     }
