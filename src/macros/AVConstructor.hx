@@ -116,10 +116,12 @@ class AVConstructor {
     }
 
     static function getAxisType(axisCl) {
+        #if macro
         var typeName = ExprTools.toString(axisCl);
         var ct = MacroStringTools.toComplex(typeName);
         var cl = Context.resolveType(ct, Context.currentPos());
         return cl;
+        #end
     }
 
     public static macro function create<T>(axisCl, extra:Array<ExprOf<T>>) {

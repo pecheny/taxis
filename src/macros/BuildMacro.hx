@@ -10,6 +10,7 @@ using StringTools;
 
 class BuildMacro {
     public static function buildAxes() {
+        #if macro
         var t = Context.getLocalType();
         var ct:ComplexType = t.toComplexType();
         var baseCt:ComplexType = switch ct {
@@ -88,9 +89,11 @@ class BuildMacro {
         // });
         // fields.push(macro final aliases = $a{[macro "foo"]});
         return fields;
+        #end
     }
 
     public static function calcNumOfvals(t:haxe.macro.Type) {
+        #if macro
         var num = 0;
         switch t {
             case TAbstract(_.get() => ab, params) if (ab.meta.has(":enum")):
@@ -107,5 +110,6 @@ class BuildMacro {
                     Context.currentPos());
         }
         return num;
+        #end
     }
 }
