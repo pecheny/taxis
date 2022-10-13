@@ -42,6 +42,12 @@ class BuildClientTest extends Test {
         Assert.equals(one, avec2[one].a);
     }
 
+    function test_can_unify_with_mode_general_declared() {
+        var avec2:AVector<TestAxis, IDummy> = AVConstructor.factoryCreate(TestAxis, a -> new Dummy(a)); // check type inference for arrow function argument
+        Assert.isOfType(avec2[zero], IDummy);
+        Assert.isOfType(avec2[zero], Dummy);
+    }
+
     function test_can_ommit_axis_with_explicit_expected() {
         var tavec:AVector<TestAxis, String> = AVConstructor.factoryCreate(a -> "" + a);
         Assert.equals("one", tavec[one]);
@@ -64,7 +70,7 @@ class BuildClientTest extends Test {
     }
 }
 
-class Dummy {
+class Dummy implements IDummy {
     public var a:TestAxis;
 
     public function new(a) {
@@ -72,6 +78,7 @@ class Dummy {
     }
 }
 
+interface IDummy {}
 typedef TestAVector<T> = AVector<TestAxis, T>
 
 @:generic

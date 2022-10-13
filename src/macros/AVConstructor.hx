@@ -35,12 +35,14 @@ class AVConstructor {
         } else {
             Context.fatalError("Can't infere factory function type: \n" + fac + "\n " + fac.toString(), Context.currentPos());
         }
-        
-        
+
         var expected = extractExpected(Context.getExpectedType());
-        if (expected != null)
-            Context.unify(valCt0, expected);
-        var valCt = valCt0.follow().toComplexType();
+        var valCt = if (expected != null) {
+            Context.unify(expected, valCt0);
+            expected.follow().toComplexType();
+        } else {
+            valCt0.follow().toComplexType();
+        }
 
         if (valCt == null)
             Context.fatalError("Factory function returns incompatible type " + valCt0.toString(), Context.currentPos());
