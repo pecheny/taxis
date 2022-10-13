@@ -5,25 +5,68 @@ import utest.Test;
 import TestAxis;
 
 class BuildClientTest extends Test {
-	public function testbBuildingClient() {
-		var it:Iterator<TestAxis> = TestAxis.iterator();
-		for (a in it) {
-			var a1:TestAxis = a;
-		}
-		var tavec:AVector<TestAxis, TestAxis> = AVConstructor.factoryCreate(TestAxis, a -> a); // can infere type by declared one
-		var tavec:AVector<TestAxis, Array<String>> = AVConstructor.factoryCreate(TestAxis, a -> null); // can infere type by declared one
-		var tavec:TestAVector<Array<String>> = AVConstructor.factoryCreate(TestAxis, a -> null); // can infere type by declared one
-		var tavec:AVector<TestAxis, String> = AVConstructor.factoryCreate(TestAxis, a -> "" + a);//Can unify campatible types
-		var tavec = AVConstructor.factoryCreate(TestAxis, a -> "" + a); //can infere type according to ret type of the fac
-		var val = tavec[one];
-		Assert.isOfType(val, String);
-		var c = new ContainerSmpl<TestAxis>(3);
-		Assert.same(["zero zero", "one one", "two two"], c.tostrings); // test toString in generic user classes
-	}
+    function test_unify_with_typedef() {
+        var tavec:TestAVector<Array<String>> = AVConstructor.factoryCreate(TestAxis, a -> ["" + a]);
+        var compatType = Type.getClass(new haxe.ds.Vector<Array<String>>(1));
+        Assert.isOfType(tavec, compatType);
+    }
+
+    function test_unify_with_null_ret() {
+        var tavec:AVector<TestAxis, Array<String>> = AVConstructor.factoryCreate(TestAxis, a -> null); // can infere type by declared one
+        var compatType = Type.getClass(new haxe.ds.Vector<Array<String>>(1));
+        Assert.isOfType(tavec, compatType);
+        Assert.isNull(tavec[one]);
+    }
+
+    function test_unify_compatible_types() {
+        var tavec:AVector<TestAxis, String> = AVConstructor.factoryCreate(TestAxis, a -> "" + a); // Can unify compatible types
+        Assert.notNull(tavec);
+        var tavec2:AVector<TestAxis, TestAxis> = AVConstructor.factoryCreate(TestAxis, a -> a); // can infere type by declared one
+        Assert.equals(1, tavec2[one]);
+        Assert.equals("one", "" + tavec2[one]);
+    }
+
+    function test_axis_usage_in_generic_user_class() {
+        var c = new ContainerSmpl<TestAxis>(3);
+        Assert.same(["zero zero", "one one", "two two"], c.tostrings); // test toString in generic user classes
+    }
+
+    function test_can_infere_type_according_to_ret_type_of_the_fac() {
+        var tavec = AVConstructor.factoryCreate(TestAxis, a -> "" + a); // can infere type according to ret type of the fac
+        var val = tavec[one];
+        Assert.isOfType(val, String);
+
+        var avec2:AVector<TestAxis, Dummy> = AVConstructor.factoryCreate(TestAxis, a -> new Dummy(a)); // check type inference for arrow function argument
+        Assert.equals(one, avec2[one].a);
+    }
 
     function test_can_ommit_axis_with_explicit_expected() {
-		var tavec:AVector<TestAxis, String> = AVConstructor.factoryCreate(a -> "" + a);//Can unify campatible types
+        var tavec:AVector<TestAxis, String> = AVConstructor.factoryCreate(a -> "" + a);
         Assert.equals("one", tavec[one]);
+    }
+
+    function test_factoryCreate_with_method_reference() {
+        var avec3:AVector<TestAxis, String> = AVConstructor.factoryCreate(TestAxis, dummyFactory); // check type inference for method reference
+        Assert.equals(TestAxis.zero.toString(), "" + avec3[zero]);
+    }
+
+    function dummyFactory(a:TestAxis) {
+        return "" + a;
+    }
+
+    public function test_create() {
+        // Assert.raises(() -> AVConstructor.create(TestAxis, TestAxis.one, TestAxis.two), null, "Should fail on wrong number of args"); -- fails in compile time.
+        var avec = AVConstructor.create(TestAxis, TestAxis.zero, TestAxis.one, TestAxis.two);
+        Assert.equals(TestAxis.zero, avec[zero]);
+        Assert.equals(TestAxis.zero.toString(), "" + avec[zero]);
+    }
+}
+
+class Dummy {
+    public var a:TestAxis;
+
+    public function new(a) {
+        this.a = a;
     }
 }
 
@@ -31,12 +74,12 @@ typedef TestAVector<T> = AVector<TestAxis, T>
 
 @:generic
 class ContainerSmpl<TAxis:Axis<TAxis>> {
-	var layoutMap:AVector<TAxis, String>;
+    var layoutMap:AVector<TAxis, String>;
 
-	public var tostrings:Array<String>;
+    public var tostrings:Array<String>;
 
-	public function new(n) {
-		layoutMap = AVConstructor.factoryCreate(TAxis, a -> "" + a, n);
-		tostrings = [for (a in layoutMap.axes()) layoutMap[a] + " " + a];
-	}
+    public function new(n) {
+        layoutMap = AVConstructor.factoryCreate(TAxis, a -> "" + a, n);
+        tostrings = [for (a in layoutMap.axes()) layoutMap[a] + " " + a];
+    }
 }
