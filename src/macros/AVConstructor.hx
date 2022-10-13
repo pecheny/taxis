@@ -92,6 +92,8 @@ class AVConstructor {
     }
 
     static function extractExpectedAxis(t:Type) {
+        if (t == null)
+            return null;
         return switch t {
             case TAbstract(_.get() => {name: "AVector"}, [ax, _]):
                 ax;
@@ -99,12 +101,14 @@ class AVConstructor {
                 #if macro
                 var t:Type = TypeTools.applyTypeParameters(dt.type, dt.params, params);
                 #end
-                extractExpected(t);
+                extractExpectedAxis(t);
             case _: null;
         }
     }
 
     static function extractExpected(t:Type) {
+        if (t == null)
+            return null;
         return switch t {
             case TAbstract(_.get() => {name: "AVector"}, [_, t]):
                 t;
