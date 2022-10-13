@@ -37,6 +37,12 @@ common.hxml
 common.hxml
 -cpp bin/cpp
 
+-cmd echo "[Building Flash]"
+--next
+common.hxml
+-swf bin/test.swf
+
+
 ##
 # Run
 ##
