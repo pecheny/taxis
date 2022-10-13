@@ -1,5 +1,6 @@
 package macros;
 
+import haxe.EnumTools;
 import haxe.macro.Type.ClassType;
 import macros.BuildMacro;
 import haxe.macro.Expr;
@@ -130,16 +131,37 @@ class AVConstructor {
         #end
     }
 
-    public static macro function create<T>(axisCl, extra:Array<ExprOf<T>>) {
-        var cl = getAxisType(axisCl);
-        var n = BuildMacro.calcNumOfvals(cl);
+    public static macro function create<T>(extra:Array<Expr>) {
+        var expectedAxis = extractExpectedAxis(Context.getExpectedType());
+        var n = 0;
+        if (expectedAxis != null) { // type of expected AVector is set explicit
+            n = BuildMacro.calcNumOfvals(expectedAxis);
+            if (extra.length == n + 1) {
+                var at = getAxisType(extra.shift());
+            }
+        } else { // treat first arg as axisType
+            expectedAxis = getAxisType(extra.shift());
+            n = BuildMacro.calcNumOfvals(expectedAxis);
+        }
+
         if (n != extra.length)
-            Context.fatalError('AVector of $cl should contain $n elements, but you pass ${extra.length}', Context.currentPos());
+            Context.fatalError('AVector of $expectedAxis should contain $n elements, but you pass ${extra.length}', Context.currentPos());
 
-        var ct:ComplexType = cl.toComplexType();
-        var valCt = Context.typeof(extra[0]).toComplexType();
-        var vectorCt = macro:AVector<$ct, $valCt>;
+        var valCt0 = Context.typeof(extra[0]);
 
+        var expected = extractExpected(Context.getExpectedType());
+        if (expected == null)
+            expected = Context.typeof(extra[0]);
+
+        var type = Context.typeof(extra[0]);
+        for (arg in extra) {
+            var argT = Context.typeof(arg);
+           Context.unify(expected, argT);
+        }
+
+        var valCt = expected.follow().toComplexType();
+        var axct = expectedAxis.toComplexType();
+        var vectorCt = macro:AVector<$axct, $valCt>;
         var assignExprs = [];
         for (i in 0...n)
             assignExprs.push(macro av[cast $v{i}] = ${extra[i]});

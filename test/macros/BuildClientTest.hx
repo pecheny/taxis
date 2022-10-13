@@ -42,8 +42,15 @@ class BuildClientTest extends Test {
         Assert.equals(one, avec2[one].a);
     }
 
-    function test_can_unify_with_mode_general_declared() {
+    function test_can_unify_with_more_general_declared() {
         var avec2:AVector<TestAxis, IDummy> = AVConstructor.factoryCreate(TestAxis, a -> new Dummy(a)); // check type inference for arrow function argument
+        Assert.isOfType(avec2[zero], IDummy);
+        Assert.isOfType(avec2[zero], Dummy);
+    }
+
+    function test_create_can_unify_with_more_general_declared() {
+        var avec2:AVector<TestAxis, IDummy> = AVConstructor.create(TestAxis, new Dummy(zero), new Dummy(zero),
+            new Dummy(zero)); // check type inference for arrow function argument
         Assert.isOfType(avec2[zero], IDummy);
         Assert.isOfType(avec2[zero], Dummy);
     }
@@ -51,6 +58,13 @@ class BuildClientTest extends Test {
     function test_can_ommit_axis_with_explicit_expected() {
         var tavec:AVector<TestAxis, String> = AVConstructor.factoryCreate(a -> "" + a);
         Assert.equals("one", tavec[one]);
+    }
+
+    function test_create_can_ommit() {
+        var avec2:AVector<TestAxis, IDummy> = AVConstructor.create(new Dummy(zero), new Dummy(zero),
+            new Dummy(zero)); // check type inference for arrow function argument
+        Assert.isOfType(avec2[zero], IDummy);
+        Assert.isOfType(avec2[zero], Dummy);
     }
 
     function test_factoryCreate_with_method_reference() {
@@ -67,6 +81,14 @@ class BuildClientTest extends Test {
         var avec = AVConstructor.create(TestAxis, TestAxis.zero, TestAxis.one, TestAxis.two);
         Assert.equals(TestAxis.zero, avec[zero]);
         Assert.equals(TestAxis.zero.toString(), "" + avec[zero]);
+
+        var avec2:AVector<TestAxis, IDummy> = AVConstructor.create(new Dummy(zero), new Dummy(zero), new Dummy(zero));
+        Assert.isOfType(avec2[zero], IDummy);
+        Assert.isOfType(avec2[zero], Dummy);
+
+        var avec3:TestAVector<Float> = AVConstructor.create(0., 0., 0.);
+        var avec3:TestAVector<Float> = AVConstructor.create(TestAxis, 0., 0., 0.);
+        Assert.equals(0., avec3[zero]);
     }
 }
 
