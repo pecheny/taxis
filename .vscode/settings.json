@@ -5,9 +5,13 @@
     },
     "haxeTestExplorer.testCommand": [
         "${haxe}",
-        "test.hxml",
+        "common.hxml",
         "-lib",
         "test-adapter"
+    ],
+    "haxe.configurations": [
+        ["common.hxml", "-x", "TestMain"],
+        ["test-neko.hxml"]
     ],
     "editor.insertSpaces": true,
     "editor.tabSize": 4,

@@ -5,7 +5,11 @@
 			"name": "Debug",
 			"type": "haxe-eval",
 			"request": "launch",
-			"args": ["test-neko.hxml", "--lib", "test-adapter"]
-		}
+			"args": ["common.hxml", "--lib", "test-adapter"]
+		},
+        {
+            "name": "Test",
+            "type": "node"
+        }
 	]
 }

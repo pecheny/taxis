@@ -16,6 +16,8 @@ class BuildClientTest extends Test {
         var compatType = Type.getClass(new haxe.ds.Vector<Array<String>>(1));
         Assert.isOfType(tavec, compatType);
         Assert.isNull(tavec[one]);
+        tavec[zero] = ["foo"];
+        Assert.same(["foo"], tavec[zero]);
     }
 
     function test_unify_compatible_types() {
