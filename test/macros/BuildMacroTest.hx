@@ -18,5 +18,11 @@ class BuildMacroTest extends Test {
 		Assert.same([zero, one, two], iterated);
     }
 
+    public function test_fromInt() {
+        var a = TestAxis.fromInt(2);
+        Assert.equals(two, a);
+        Assert.raises(()->{var a = TestAxis.fromInt(3);
+        trace(a);} );
+    }
 
 }

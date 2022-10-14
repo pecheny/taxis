@@ -6,9 +6,11 @@ import haxe.ds.ReadOnlyArray;
 import haxe.macro.Context;
 
 using haxe.macro.TypeTools;
+using haxe.macro.ComplexTypeTools;
 using StringTools;
 
 class BuildMacro {
+    static var safe_from_int = true;
     public static function buildAxes() {
         #if macro
         var t = Context.getLocalType();
@@ -56,6 +58,17 @@ class BuildMacro {
                 ret: macro:Iterator<$baseCt>
             }),
             access: [APublic, AStatic]
+        });
+        fields.push({
+            pos: Context.currentPos(),
+            name: "fromInt",
+            kind: FieldType.FFun({
+                args: [{name:"i", type: macro : Int}],
+                expr: if (safe_from_int) macro if (i < 0 || i > $v{vals.length - 1}) throw "" + i + " cant be converterd to " + $v{baseCt.toString()}  else return cast i;
+                    else macro return cast i,
+                ret: macro:$baseCt
+            }),
+            access: [APublic, AStatic, AInline]
         });
         // fields.push({
         // 	pos: Context.currentPos(),
