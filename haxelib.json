@@ -3,7 +3,7 @@
     "url" : "https://github.com/pecheny/taxis",
     "license": "MIT",
     "tags": ["vector", "collection", "axis", "cross"],
-    "description": "This library is useless in the same way on every platform.",
+    "description": "Vector2D -> Vector<Axis2D, Float>. Generalizing axis-based vectors.",
     "version": "1.0.0",
     "classPath": "src",
     "releasenote": "Initial release, everything is working correctly.",
