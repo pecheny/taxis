@@ -1,5 +1,5 @@
 @:build(macros.BuildMacro.buildAxes())
-@:enum abstract Axis2D(Axis<Axis2D>) to Axis<Axis2D> {
+@:enum abstract Axis2D(Axis<Axis2D>) to Axis<Axis2D> to Int {
     var horizontal;
     var vertical;
 }
