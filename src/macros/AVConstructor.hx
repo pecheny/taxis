@@ -14,6 +14,47 @@ using Std;
 using macros.AVConstructor;
 
 class AVConstructor {
+    public static macro function create<T>(extra:Array<Expr>) {
+        var expectedAxis = extractExpectedAxis(Context.getExpectedType());
+        var n = 0;
+        if (expectedAxis != null) { // type of expected AVector is set explicit
+            n = BuildMacro.calcNumOfvals(expectedAxis);
+            if (extra.length == n + 1) {
+                var at = getAxisType(extra.shift());
+            }
+        } else { // treat first arg as axisType
+            expectedAxis = getAxisType(extra.shift());
+            n = BuildMacro.calcNumOfvals(expectedAxis);
+        }
+
+        if (n != extra.length)
+            Context.fatalError('AVector of $expectedAxis should contain $n elements, but you pass ${extra.length}', Context.currentPos());
+
+        var valCt0 = Context.typeof(extra[0]);
+
+        var expected = extractExpected(Context.getExpectedType());
+        if (expected == null)
+            expected = Context.typeof(extra[0]);
+
+        var type = Context.typeof(extra[0]);
+        for (arg in extra) {
+            var argT = Context.typeof(arg);
+            Context.unify(expected, argT);
+        }
+
+        var valCt = expected.follow().toComplexType();
+        var axct = expectedAxis.toComplexType();
+        var vectorCt = macro:AVector<$axct, $valCt>;
+        var assignExprs = [];
+        for (i in 0...n)
+            assignExprs.push(macro av[cast $v{i}] = ${extra[i]});
+        return macro {
+            var av:$vectorCt = cast new haxe.ds.Vector<$valCt>($v{n});
+            $b{assignExprs};
+            av;
+        };
+    }
+
     /**
         Generates code of creating a AVector<TAxis, T>
         @param axisCl - [optional] type of axis.
@@ -129,47 +170,6 @@ class AVConstructor {
         var cl = Context.resolveType(ct, Context.currentPos());
         return cl;
         #end
-    }
-
-    public static macro function create<T>(extra:Array<Expr>) {
-        var expectedAxis = extractExpectedAxis(Context.getExpectedType());
-        var n = 0;
-        if (expectedAxis != null) { // type of expected AVector is set explicit
-            n = BuildMacro.calcNumOfvals(expectedAxis);
-            if (extra.length == n + 1) {
-                var at = getAxisType(extra.shift());
-            }
-        } else { // treat first arg as axisType
-            expectedAxis = getAxisType(extra.shift());
-            n = BuildMacro.calcNumOfvals(expectedAxis);
-        }
-
-        if (n != extra.length)
-            Context.fatalError('AVector of $expectedAxis should contain $n elements, but you pass ${extra.length}', Context.currentPos());
-
-        var valCt0 = Context.typeof(extra[0]);
-
-        var expected = extractExpected(Context.getExpectedType());
-        if (expected == null)
-            expected = Context.typeof(extra[0]);
-
-        var type = Context.typeof(extra[0]);
-        for (arg in extra) {
-            var argT = Context.typeof(arg);
-           Context.unify(expected, argT);
-        }
-
-        var valCt = expected.follow().toComplexType();
-        var axct = expectedAxis.toComplexType();
-        var vectorCt = macro:AVector<$axct, $valCt>;
-        var assignExprs = [];
-        for (i in 0...n)
-            assignExprs.push(macro av[cast $v{i}] = ${extra[i]});
-        return macro {
-            var av:$vectorCt = cast new haxe.ds.Vector<$valCt>($v{n});
-            $b{assignExprs};
-            av;
-        };
     }
 
     // macro public static function iterator(cl) {

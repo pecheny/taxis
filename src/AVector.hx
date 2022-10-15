@@ -16,8 +16,12 @@ abstract AVector<TAxis:Axis<TAxis>, T>(haxe.ds.Vector<T>) {
         return new AxisIterator(0, this.length);
     }
 
-    public inline function readonly():ReadOnlyAVector<TAxis, T> {
+    @:to public inline function readonly():ReadOnlyAVector<TAxis, T> {
         return cast this;
+    }
+
+    public inline function copy():AVector<TAxis, T> {
+        return cast this.copy();
     }
 }
 
