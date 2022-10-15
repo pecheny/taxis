@@ -33,6 +33,12 @@ class BuildClientTest extends Test {
         Assert.same(["zero zero", "one one", "two two"], c.tostrings); // test toString in generic user classes
     }
 
+    function test_empty() {
+        var c = new ContainerSmpl<TestAxis>(3);
+        var empty:AVector<TestAxis, Dummy> = c.empty;
+        Assert.isNull(empty[two]);
+    }
+
     function test_can_infere_type_according_to_ret_type_of_the_fac() {
         var tavec = AVConstructor.factoryCreate(TestAxis, a -> "" + a); // can infere type according to ret type of the fac
         var val = tavec[one];
@@ -107,10 +113,12 @@ typedef TestAVector<T> = AVector<TestAxis, T>
 class ContainerSmpl<TAxis:Axis<TAxis>> {
     var layoutMap:AVector<TAxis, String>;
 
+    public var empty:AVector<TAxis, Dummy>;
     public var tostrings:Array<String>;
 
     public function new(n) {
         layoutMap = AVConstructor.factoryCreate(TAxis, a -> "" + a, n);
         tostrings = [for (a in layoutMap.axes()) layoutMap[a] + " " + a];
+        empty = AVConstructor.empty(n);
     }
 }

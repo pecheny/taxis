@@ -14,6 +14,32 @@ using Std;
 using macros.AVConstructor;
 
 class AVConstructor {
+    public static macro function empty<T>(?nm) {
+        var expectedAxis = extractExpectedAxis(Context.getExpectedType());
+        var expected = extractExpected(Context.getExpectedType());
+        if (expected == null || expectedAxis == null)
+            Context.fatalError("You should properly declare type of variable to assign value from empty()", Context.currentPos());
+        var countExpr:Expr = null;
+        countExpr = switch nm.expr {
+            case EConst(CIdent("null")):
+                macro $v{BuildMacro.calcNumOfvals(expectedAxis)};
+            case EConst(CIdent(s)):
+                macro $i{s};
+            case EConst(CInt(_.parseInt() => s)):
+                macro $v{s};
+            case _:
+                Context.fatalError("Only int const or int variable can be used as nm argument", Context.currentPos());
+                throw "Wrong";
+        }
+        var valCt = expected.follow().toComplexType();
+        var axct = expectedAxis.toComplexType();
+        var vectorCt = macro:AVector<$axct, $valCt>;
+        return macro {
+            var r:$vectorCt = cast new haxe.ds.Vector<$valCt>($countExpr);
+            r;
+        };
+    }
+
     public static macro function create<T>(extra:Array<Expr>) {
         var expectedAxis = extractExpectedAxis(Context.getExpectedType());
         var n = 0;
