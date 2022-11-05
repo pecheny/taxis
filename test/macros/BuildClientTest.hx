@@ -1,5 +1,6 @@
 package macros;
 
+import AVector.ReadOnlyAVector;
 import utest.Assert;
 import utest.Test;
 import TestAxis;
@@ -95,6 +96,11 @@ class BuildClientTest extends Test {
         var avec3:TestAVector<Float> = AVConstructor.create(0., 0., 0.);
         var avec3:TestAVector<Float> = AVConstructor.create(TestAxis, 0., 0., 0.);
         Assert.equals(0., avec3[zero]);
+    }
+
+    function test_create_RO() {
+        var avec2:ReadOnlyAVector<TestAxis, IDummy> = AVConstructor.create(new Dummy(zero), new Dummy(zero), new Dummy(zero));
+        Assert.isOfType(avec2[zero], IDummy);
     }
 }
 

@@ -163,7 +163,7 @@ class AVConstructor {
         if (t == null)
             return null;
         return switch t {
-            case TAbstract(_.get() => {name: "AVector"}, [ax, _]):
+            case TAbstract(_.get() => {name: "AVector" | "ReadOnlyAVector"}, [ax, _]):
                 ax;
             case TType(_.get() => dt, params):
                 #if macro
@@ -178,7 +178,7 @@ class AVConstructor {
         if (t == null)
             return null;
         return switch t {
-            case TAbstract(_.get() => {name: "AVector"}, [_, t]):
+            case TAbstract(_.get() => {name: "AVector"| "ReadOnlyAVector"}, [_, t]):
                 t;
             case TType(_.get() => dt, params):
                 #if macro
