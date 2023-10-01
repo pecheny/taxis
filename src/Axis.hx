@@ -3,6 +3,8 @@ package;
 import haxe.ds.ReadOnlyArray;
 
 abstract Axis<T:Axis<T>>(Int) to Int from Int {
+    // TODO generate key arrays with macro according to required by dependencies
+    public static final k0:ReadOnlyArray<Int> = [];
     public static final k1:ReadOnlyArray<Int> = [0];
     public static final k2:ReadOnlyArray<Int> = [0, 1];
     public static final k3:ReadOnlyArray<Int> = [0, 1, 2];
