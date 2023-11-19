@@ -25,4 +25,8 @@ class BuildMacroTest extends Test {
         trace(a);} );
     }
 
+    public function test_basis_name() {
+        Assert.equals("TestAxis", TestAxis.basisTypeName());
+    }
+
 }

@@ -15,10 +15,12 @@ class BuildMacro {
         #if macro
         var t = Context.getLocalType();
         var ct:ComplexType = t.toComplexType();
+        var basisName:String;
         var baseCt:ComplexType = switch ct {
             case TPath(tp):
+                basisName = tp.name.replace("_Impl_", "");
                 TPath({
-                    name: tp.name.replace("_Impl_", ""),
+                    name: basisName,
                     params: tp.params,
                     pack: tp.pack,
                     sub: tp.sub
@@ -41,6 +43,12 @@ class BuildMacro {
             name: "aliases",
             kind: FieldType.FVar(macro:haxe.ds.ReadOnlyArray<String>, macro $a{vals}),
             access: [APublic, AStatic, AFinal]
+        });
+        fields.push({
+            pos: Context.currentPos(),
+            name: "basisTypeName",
+            kind: FieldType.FFun({args: [], expr: macro return $v{basisName}}),
+            access: [APublic, AStatic, AInline]
         });
         fields.push({
             pos: Context.currentPos(),
